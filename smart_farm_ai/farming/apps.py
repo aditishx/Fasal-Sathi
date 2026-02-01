@@ -2,4 +2,5 @@ from django.apps import AppConfig
 
 
 class FarmingConfig(AppConfig):
-    name = 'farming'
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'smart_farm_ai.farming'
