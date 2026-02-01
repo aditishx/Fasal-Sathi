@@ -54,7 +54,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'smart_farm_ai.urls'
+ROOT_URLCONF = 'smart_farm_ai.smart_farm_ai.urls'
+
 
 TEMPLATES = [
     {
@@ -71,7 +72,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'smart_farm_ai.wsgi.application'
+WSGI_APPLICATION = 'smart_farm_ai.smart_farm_ai.wsgi.application'
+
 
 
 # Database
