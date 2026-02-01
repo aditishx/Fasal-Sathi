@@ -1,0 +1,500 @@
+{% extends 'farming/base.html' %}
+{% load i18n %}
+
+{% block content %}
+<style>
+    .blog-header {
+        background-color: var(--faded-copper);
+        color: var(--vanilla-cream);
+        padding: 60px 40px;
+        border-radius: 20px;
+        margin: 40px 0;
+        text-align: center;
+        animation: slideInDown 0.6s ease;
+    }
+
+    .blog-header h1 {
+        font-size: 3rem;
+        font-weight: 900;
+        margin-bottom: 10px;
+        color: var(--vanilla-cream);
+    }
+
+    .blog-header p {
+        font-size: 1.2rem;
+        color: var(--cream);
+        font-weight: 500;
+    }
+
+    .blog-container {
+        margin: 60px 0;
+    }
+
+    .blog-tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 40px;
+        flex-wrap: wrap;
+        animation: fadeIn 0.8s ease 0.2s both;
+    }
+
+    .tab-button {
+        padding: 12px 30px;
+        border: 2px solid #ddd;
+        background: white;
+        border-radius: 50px;
+        cursor: pointer;
+        font-weight: 700;
+        transition: all 0.3s ease;
+        color: #333;
+    }
+
+    .tab-button:hover {
+        border-color: var(--faded-copper);
+        color: var(--faded-copper);
+    }
+
+    .tab-button.active {
+        background: var(--faded-copper);
+        color: white;
+        border-color: var(--faded-copper);
+    }
+
+    .blog-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 30px;
+        animation: fadeIn 0.8s ease 0.3s both;
+    }
+
+    .blog-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border-top: 6px solid var(--faded-copper);
+    }
+
+    .blog-card:hover {
+        transform: translateY(-15px);
+        box-shadow: 0 30px 60px rgba(108, 88, 76, 0.2);
+    }
+
+    .blog-card-header {
+        background-color: var(--vanilla-cream);
+        padding: 25px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .blog-icon {
+        font-size: 2.5rem;
+        color: var(--faded-copper);
+        margin-bottom: 15px;
+    }
+
+    .blog-card h3 {
+        color: var(--ash-brown);
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .blog-date {
+        color: #999;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .blog-card-content {
+        padding: 25px;
+    }
+
+    .blog-card p {
+        color: #666;
+        font-size: 0.95rem;
+        line-height: 1.7;
+        margin-bottom: 20px;
+    }
+
+    .blog-card ul {
+        list-style: none;
+        padding-left: 0;
+        margin-bottom: 20px;
+    }
+
+    .blog-card li {
+        color: #666;
+        padding: 8px 0;
+        padding-left: 25px;
+        position: relative;
+        font-size: 0.95rem;
+    }
+
+    .blog-card li::before {
+        content: '✓';
+        color: var(--muted-olive);
+        font-weight: bold;
+        position: absolute;
+        left: 0;
+        font-size: 1.1rem;
+    }
+
+    .blog-card .read-more {
+        display: inline-block;
+        color: var(--faded-copper);
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .blog-card .read-more:hover {
+        color: var(--ash-brown);
+        transform: translateX(5px);
+    }
+
+    .featured-article {
+        background: linear-gradient(135deg, var(--vanilla-cream) 0%, var(--cream) 100%);
+        border-radius: 20px;
+        padding: 40px;
+        margin-bottom: 50px;
+        border-left: 6px solid var(--muted-olive);
+        animation: slideInUp 0.6s ease;
+    }
+
+    .featured-article h2 {
+        color: var(--ash-brown);
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 15px;
+    }
+
+    .featured-article p {
+        color: #555;
+        font-size: 1.05rem;
+        line-height: 1.8;
+        margin-bottom: 20px;
+    }
+
+    .featured-article .btn {
+        background: var(--muted-olive);
+        color: var(--vanilla-cream);
+        padding: 12px 30px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 700;
+        display: inline-block;
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    .featured-article .btn:hover {
+        background: var(--faded-copper);
+        transform: translateY(-3px);
+        color: var(--vanilla-cream);
+    }
+
+    .category-badge {
+        display: inline-block;
+        background: var(--muted-olive);
+        color: white;
+        padding: 5px 15px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .tip-box {
+        background: linear-gradient(135deg, var(--vanilla-cream) 0%, var(--cream) 100%);
+        border-left: 4px solid var(--muted-olive);
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 15px;
+    }
+
+    .tip-box p {
+        color: var(--ash-brown);
+        margin: 0;
+        font-weight: 500;
+    }
+
+    @keyframes slideInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .blog-header h1 {
+            font-size: 2rem;
+        }
+
+        .blog-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .featured-article {
+            padding: 25px;
+        }
+
+        .featured-article h2 {
+            font-size: 1.6rem;
+        }
+    }
+</style>
+
+{% get_current_language as LANGUAGE_CODE %}
+
+<!-- Blog Header -->
+<div class="blog-header">
+    {% if LANGUAGE_CODE == 'hi' %}
+    <h1>📚 कृषि समाचार और ज्ञान</h1>
+    <p>किसानी से जुड़ी ताज़ा ख़बरें, सुझाव और विशेषज्ञों की सलाह यहाँ पढ़ें</p>
+    {% else %}
+    <h1>📚 Agricultural News & Insights</h1>
+    <p>Stay updated with the latest farming trends, tips, and expert advice</p>
+    {% endif %}
+</div>
+
+<!-- Featured Article -->
+<div class="featured-article">
+    <div class="category-badge">Featured Story</div>
+    <h2>Sustainable Farming Practices for Maximum Yield</h2>
+    <p>
+        Discover how modern farmers are combining traditional wisdom with cutting-edge technology to achieve remarkable
+        yields while preserving the environment.
+        Learn about crop rotation, organic pest management, and water conservation strategies that are transforming
+        agriculture worldwide.
+    </p>
+    <a href="https://www.ucs.org/resources/sustainable-agriculture-practices" class="btn" target="_blank"
+        rel="noopener noreferrer">
+        <i class="fas fa-arrow-right"></i> Read Full Article
+    </a>
+</div>
+
+<!-- Blog Cards Grid -->
+<div class="blog-grid">
+    <!-- Blog Card 1: News -->
+    <div class="blog-card">
+        <div class="blog-card-header">
+            <div class="blog-icon">
+                <i class="fas fa-newspaper"></i>
+            </div>
+            <h3>Global Crop Prices Rise 15%</h3>
+            <div class="blog-date"><i class="fas fa-calendar"></i> January 2026</div>
+        </div>
+        <div class="blog-card-content">
+            <div class="category-badge">News</div>
+            <p>
+                Recent market reports show a significant increase in crop prices due to favorable weather conditions and
+                increased demand. Farmers are encouraged to capitalize on this trend.
+            </p>
+            <ul>
+                <li>Wheat prices up 18%</li>
+                <li>Rice prices up 12%</li>
+                <li>Corn prices up 9%</li>
+            </ul>
+            <a href="https://www.fao.org/3/cd7448en/cd7448en.pdf" class="read-more" target="_blank"
+                rel="noopener noreferrer">
+                <i class="fas fa-arrow-right"></i> Read More
+            </a>
+            <div class="tip-box">
+                <p>💡 Best time to sell if you harvested recently!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Blog Card 2: Disease Prevention Tip -->
+    <div class="blog-card">
+        <div class="blog-card-header">
+            <div class="blog-icon">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <h3>5 Tips to Prevent Plant Diseases</h3>
+            <div class="blog-date"><i class="fas fa-calendar"></i> January 2026</div>
+        </div>
+        <div class="blog-card-content">
+            <div class="category-badge">Tips</div>
+            <p>
+                Plant diseases can devastate your harvest. Learn preventive measures that are simple yet highly
+                effective for maintaining healthy crops throughout the season.
+            </p>
+            <ul>
+                <li>Proper crop rotation annually</li>
+                <li>Water early morning only</li>
+                <li>Remove infected leaves immediately</li>
+                <li>Use disease-resistant seeds</li>
+                <li>Maintain clean farm tools</li>
+            </ul>
+            <a href="https://extension.umn.edu/vegetables/preventing-plant-diseases-farms" class="read-more"
+                target="_blank" rel="noopener noreferrer">
+                <i class="fas fa-arrow-right"></i> Read More
+            </a>
+        </div>
+    </div>
+
+    <!-- Blog Card 3: Technology -->
+    <div class="blog-card">
+        <div class="blog-card-header">
+            <div class="blog-icon">
+                <i class="fas fa-robot"></i>
+            </div>
+            <h3>AI Revolution in Agriculture</h3>
+            <div class="blog-date"><i class="fas fa-calendar"></i> January 2026</div>
+        </div>
+        <div class="blog-card-content">
+            <div class="category-badge">Technology</div>
+            <p>
+                Artificial intelligence is transforming modern farming with precision agriculture, predictive analytics,
+                and automated disease detection systems.
+            </p>
+            <ul>
+                <li>Drone monitoring of crops</li>
+                <li>Soil health predictions</li>
+                <li>Disease early detection</li>
+                <li>Yield optimization</li>
+                <li>Weather-based recommendations</li>
+            </ul>
+            <a href="https://www.worldbank.org/en/topic/agriculture/publication/harnessing-artificial-intelligence-for-agricultural-transformation"
+                class="read-more" target="_blank" rel="noopener noreferrer">
+                <i class="fas fa-arrow-right"></i> Read More
+            </a>
+        </div>
+    </div>
+
+    <!-- Blog Card 4: Fun Fact -->
+    <div class="blog-card">
+        <div class="blog-card-header">
+            <div class="blog-icon">
+                <i class="fas fa-lightbulb"></i>
+            </div>
+            <h3>Did You Know? Amazing Farm Facts</h3>
+            <div class="blog-date"><i class="fas fa-calendar"></i> January 2026</div>
+        </div>
+        <div class="blog-card-content">
+            <div class="category-badge">Fun Facts</div>
+            <p>
+                Agriculture is full of fascinating facts that many people don't know about. Here are some amazing
+                discoveries about farming and crops.
+            </p>
+            <ul>
+                <li>Honey never expires - it can last forever</li>
+                <li>Carrots were originally purple, not orange</li>
+                <li>Strawberries are not berries, bananas are</li>
+                <li>Chicken can remember over 100 faces</li>
+                <li>Potatoes can be grown on the Moon</li>
+            </ul>
+            <a href="https://www.nrdc.org/stories/regenerative-agriculture-101" class="read-more" target="_blank"
+                rel="noopener noreferrer">
+                <i class="fas fa-arrow-right"></i> Read More
+            </a>
+        </div>
+    </div>
+
+    <!-- Blog Card 5: Market Trends -->
+    <div class="blog-card">
+        <div class="blog-card-header">
+            <div class="blog-icon">
+                <i class="fas fa-chart-bar"></i>
+            </div>
+            <h3>2026 Market Trends Report</h3>
+            <div class="blog-date"><i class="fas fa-calendar"></i> January 2026</div>
+        </div>
+        <div class="blog-card-content">
+            <div class="category-badge">Market Trends</div>
+            <p>
+                Comprehensive analysis of agricultural market trends for 2026. Understanding these trends will help you
+                make better farming and investment decisions.
+            </p>
+            <ul>
+                <li>Organic farming growth: 25%</li>
+                <li>Sustainable practices adoption: 40%</li>
+                <li>Technology investment: 35% increase</li>
+                <li>Export opportunities expanding</li>
+                <li>Premium crop demand rising</li>
+            </ul>
+            <a href="https://www.oecd.org/en/publications/2025/07/oecd-fao-agricultural-outlook-2025-2034_3eb15914.html"
+                class="read-more" target="_blank" rel="noopener noreferrer">
+                <i class="fas fa-arrow-right"></i> Read More
+            </a>
+            <div class="tip-box">
+                <p>📊 Organic crops command premium prices in 2026!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Blog Card 6: Seasonal Guide -->
+    <div class="blog-card">
+        <div class="blog-card-header">
+            <div class="blog-icon">
+                <i class="fas fa-sun"></i>
+            </div>
+            <h3>Winter Crop Planning Guide</h3>
+            <div class="blog-date"><i class="fas fa-calendar"></i> January 2026</div>
+        </div>
+        <div class="blog-card-content">
+            <div class="category-badge">Seasonal</div>
+            <p>
+                Winter is the perfect time to plan your spring crops and prepare your fields. Here's a comprehensive
+                guide for winter season farm management.
+            </p>
+            <ul>
+                <li>Prepare soil for spring planting</li>
+                <li>Repair and maintain equipment</li>
+                <li>Plan crop rotation strategy</li>
+                <li>Grow winter vegetables</li>
+                <li>Protect fields from erosion</li>
+            </ul>
+            <a href="https://extension.psu.edu/start-farming-developing-your-disease-management-plan" class="read-more"
+                target="_blank" rel="noopener noreferrer">
+                <i class="fas fa-arrow-right"></i> Read More
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Additional Info Section -->
+<div style="margin-top: 80px; text-align: center; padding: 50px 20px;">
+    <h2 style="color: #1b5e20; font-size: 2.2rem; font-weight: 800; margin-bottom: 20px;">More Content Coming Soon</h2>
+    <p style="color: #666; font-size: 1.1rem; margin-bottom: 30px;">
+        We're constantly adding new articles, expert interviews, and agricultural insights. Stay tuned for more valuable
+        content!
+    </p>
+    <a href="{% url 'dashboard' %}" class="btn btn-success"
+        style="padding: 15px 45px; font-weight: 700; display: inline-block;">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+</div>
+
+{% endblock %}

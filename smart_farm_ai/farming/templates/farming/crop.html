@@ -1,0 +1,305 @@
+{% extends 'farming/base.html' %}
+{% block content %}
+
+<style>
+    .crop-container {
+        max-width: 800px;
+        margin: 60px auto;
+        animation: slideInUp 0.6s ease;
+    }
+
+    .crop-card {
+        background: white;
+        border-radius: 25px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06);
+        padding: 50px 40px;
+        border-top: 6px solid var(--muted-olive);
+    }
+
+    .crop-card h2 {
+        color: #1b5e20;
+        font-size: 2.2rem;
+        font-weight: 800;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    .crop-card .subtitle {
+        text-align: center;
+        color: #666;
+        font-size: 1.1rem;
+        margin-bottom: 40px;
+        font-weight: 500;
+    }
+
+    .form-group {
+        margin-bottom: 30px;
+        animation: fadeIn 0.8s ease;
+    }
+
+    .form-group label {
+        font-weight: 700;
+        color: #1b5e20;
+        font-size: 1.1rem;
+        margin-bottom: 12px;
+        display: block;
+        letter-spacing: 0.5px;
+    }
+
+    .form-control {
+        border: 2px solid #e0e0e0;
+        border-radius: 15px;
+        padding: 14px 18px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+        color: #333;
+    }
+
+    .form-control:focus {
+        border-color: #2e7d32;
+        box-shadow: 0 0 0 0.2rem rgba(46, 125, 50, 0.25);
+        outline: none;
+    }
+
+    .form-control option {
+        color: #333;
+    }
+
+    .form-info {
+        background-color: var(--cream);
+        border-left: 4px solid var(--muted-olive);
+        padding: 15px 20px;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        color: #555;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .form-info i {
+        color: var(--muted-olive);
+        font-size: 1.2rem;
+    }
+
+    .btn-submit {
+        width: 100%;
+        background-color: var(--faded-copper);
+        color: var(--vanilla-cream);
+        border: none;
+        border-radius: 50px;
+        padding: 16px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 20px;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+        background-color: var(--ash-brown);
+    }
+
+    .btn-submit:active {
+        transform: translateY(-1px);
+    }
+
+    .result-card {
+        background-color: var(--cream);
+        border: 2px solid var(--muted-olive);
+        border-radius: 20px;
+        padding: 40px;
+        text-align: center;
+        margin-top: 40px;
+        animation: slideInUp 0.5s ease;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    }
+
+    .result-card .result-label {
+        color: #155724;
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .result-crop {
+        font-size: 3rem;
+        font-weight: 900;
+        color: var(--ash-brown);
+        margin: 20px 0;
+        text-transform: capitalize;
+    }
+
+    .result-description {
+        color: #155724;
+        font-size: 1rem;
+        margin-top: 20px;
+        font-weight: 500;
+    }
+
+    .crop-tips {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin-top: 20px;
+        border-left: 4px solid var(--muted-olive);
+    }
+
+    .crop-tips h4 {
+        color: #1b5e20;
+        font-weight: 700;
+        margin-bottom: 12px;
+    }
+
+    .crop-tips p {
+        color: #666;
+        font-size: 0.95rem;
+        margin-bottom: 0;
+    }
+
+    .form-sections {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+    }
+
+    @media (max-width: 768px) {
+        .crop-card {
+            padding: 30px 20px;
+        }
+
+        .crop-card h2 {
+            font-size: 1.8rem;
+        }
+
+        .form-sections {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .result-crop {
+            font-size: 2.2rem;
+        }
+    }
+
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+</style>
+
+<div class="crop-container">
+    <div class="crop-card">
+        <h2><i class="fas fa-leaf"></i> Crop Recommendation</h2>
+        <p class="subtitle">Tell us about your farm, and we'll recommend the best crop to grow</p>
+
+        <div class="form-info">
+            <i class="fas fa-info-circle"></i>
+            <span>Our AI analyzes soil properties, climate conditions, and rainfall patterns to find the perfect crop
+                for your farm.</span>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-sections">
+                <!-- Left Column -->
+                <div>
+                    <div class="form-group">
+                        <label><i class="fas fa-flask"></i> Soil Fertility</label>
+                        <select name="fertility" class="form-control">
+                            <option value="">Select soil fertility level...</option>
+                            <option value="low">Low (poor quality soil)</option>
+                            <option value="medium" selected>Medium (average quality)</option>
+                            <option value="high">High (very fertile soil)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-layer-group"></i> Soil Type</label>
+                        <select name="soil_type" class="form-control">
+                            <option value="">Select soil type...</option>
+                            <option value="sandy">Sandy (drains quickly)</option>
+                            <option value="loamy" selected>Loamy (ideal for most crops)</option>
+                            <option value="clay">Clay (retains moisture)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div>
+                    <div class="form-group">
+                        <label><i class="fas fa-cloud-sun"></i> Climate</label>
+                        <select name="climate" class="form-control">
+                            <option value="">Select climate type...</option>
+                            <option value="cold">Cold (snow/frost region)</option>
+                            <option value="moderate" selected>Moderate (temperate)</option>
+                            <option value="hot">Hot (tropical/arid)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-water"></i> Rainfall</label>
+                        <select name="rainfall" class="form-control">
+                            <option value="">Select rainfall amount...</option>
+                            <option value="low">Low (dry region)</option>
+                            <option value="medium" selected>Medium (moderate rain)</option>
+                            <option value="heavy">Heavy (wet region)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-magic"></i> Get Recommendation
+            </button>
+        </form>
+
+        <!-- Result Section -->
+        {% if result %}
+        <div class="result-card">
+            <div class="result-label">🎯 Recommended Crop</div>
+            <div class="result-crop">{{ result }}</div>
+            <div class="result-description">
+                Based on your soil conditions and climate, this crop is optimized for your farm!
+            </div>
+            <div class="crop-tips">
+                <h4><i class="fas fa-lightbulb"></i> Growing Tips</h4>
+                <p>
+                    This recommendation is based on traditional agricultural practices and environmental factors.
+                    Consult with local agriculture experts for field-specific advice and weather patterns in your
+                    region.
+                </p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

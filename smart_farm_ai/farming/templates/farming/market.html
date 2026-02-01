@@ -1,0 +1,192 @@
+{% extends 'farming/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-success mb-4">📈 Market Price Prediction</h2>
+
+    <!-- Disclaimer Alert -->
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>⚠️ Disclaimer:</strong> These market predictions are based on simulated data and historical trends.
+        Actual market prices may vary significantly based on real-time factors such as weather, supply chain
+        disruptions,
+        government policies, and global market conditions. Please use these predictions for reference only and consult
+        real market data before making farming decisions.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div class="row">
+        <!-- Prediction Form -->
+        <div class="col-md-6">
+            <div class="card p-4 shadow-sm">
+                <h4 class="mb-3">Price Forecast</h4>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="crop" class="form-label">Select Crop:</label>
+                        <select class="form-select" id="crop" name="crop" required>
+                            <option value="">-- Choose a crop --</option>
+                            {% for crop in crops %}
+                            <option value="{{ crop }}">{{ crop }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <input type="hidden" name="action" value="predict">
+                    <button type="submit" class="btn btn-success w-100">Predict Prices</button>
+                </form>
+            </div>
+
+            <!-- Comparison Form -->
+            <div class="card p-4 shadow-sm mt-3">
+                <h4 class="mb-3">Compare Crops</h4>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Select Crops to Compare:</label>
+                        <div
+                            style="max-height: 250px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
+                            {% for crop in crops %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="compare_crops" value="{{ crop }}"
+                                    id="crop_{{ forloop.counter }}">
+                                <label class="form-check-label" for="crop_{{ forloop.counter }}">
+                                    {{ crop }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <input type="hidden" name="action" value="compare">
+                    <button type="submit" class="btn btn-info w-100">Compare</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div class="col-md-6">
+            {% if result %}
+            <div class="card p-4 shadow-sm border-success">
+                <h4 class="text-success mb-3">📊 {{ result.crop }} Price Forecast</h4>
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="alert alert-info text-center">
+                            <small>Average Price</small>
+                            <h5 class="mb-0">₹{{ result.avg_price }}</h5>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="alert alert-warning text-center">
+                            <small>Min Price</small>
+                            <h5 class="mb-0">₹{{ result.min_price }}</h5>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="alert alert-success text-center">
+                            <small>Max Price</small>
+                            <h5 class="mb-0">₹{{ result.max_price }}</h5>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-light mb-3">
+                    <strong>Trend:</strong> {{ result.trend }}
+                </div>
+
+                {% if result.insights %}
+                <h5 class="mt-4">Market Insights</h5>
+                <div class="alert alert-secondary">
+                    <strong>Current Price:</strong> ₹{{ result.insights.current_price }} per unit<br>
+                    <strong>Demand Level:</strong> {{ result.insights.demand }}<br>
+                    <strong>Market Trend:</strong> {{ result.insights.trend }}<br><br>
+                    <em>{{ result.insights.trend_insight }}</em><br><br>
+                    <strong>Estimated Yield per Hectare:</strong> {{ result.insights.estimated_yield_per_hectare }}
+                    units<br>
+                    <strong>Estimated Revenue per Hectare:</strong> ₹{{ result.insights.estimated_revenue_per_hectare }}
+                </div>
+
+                <h5>Key Insights:</h5>
+                <ul>
+                    {% for insight in result.insights.demand_insights %}
+                    <li>{{ insight }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+
+                <h5 class="mt-4 mb-3">30-Day Price Forecast</h5>
+                <div style="max-height: 300px; overflow-y: auto;">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Price (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for date, price in result.forecast %}
+                            <tr>
+                                <td>{{ date }}</td>
+                                <td>₹{{ price }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if comparison %}
+            <div class="card p-4 shadow-sm border-info mt-3">
+                <h4 class="text-info mb-3">📋 Crop Comparison</h4>
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Crop</th>
+                            <th>Base Price</th>
+                            <th>Demand</th>
+                            <th>Trend</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for crop_data in comparison %}
+                        <tr>
+                            <td><strong>{{ crop_data.crop }}</strong></td>
+                            <td>₹{{ crop_data.base_price }}</td>
+                            <td>
+                                {% if crop_data.demand == 'High' %}
+                                <span class="badge bg-success">{{ crop_data.demand }}</span>
+                                {% elif crop_data.demand == 'Medium' %}
+                                <span class="badge bg-warning">{{ crop_data.demand }}</span>
+                                {% else %}
+                                <span class="badge bg-danger">{{ crop_data.demand }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if crop_data.trend == 'Increasing' %}
+                                <span class="badge bg-success">📈 {{ crop_data.trend }}</span>
+                                {% elif crop_data.trend == 'Decreasing' %}
+                                <span class="badge bg-danger">📉 {{ crop_data.trend }}</span>
+                                {% else %}
+                                <span class="badge bg-info">➡️ {{ crop_data.trend }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        transition: transform 0.2s;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1) !important;
+    }
+</style>
+{% endblock %}

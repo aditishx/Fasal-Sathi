@@ -1,0 +1,724 @@
+{% extends 'farming/base.html' %}
+{% load i18n %}
+
+{% block content %}
+<style>
+    /* Reference design: two-column hero + icons grid */
+    .hero-banner-wrapper {
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-bottom: 0;
+        overflow: hidden;
+    }
+
+    .hero-banner {
+        display: flex;
+        flex-wrap: wrap;
+        min-height: 420px;
+    }
+
+    .hero-image-col {
+        flex: 1 1 50%;
+        min-height: 380px;
+        background: url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi6zjzyl9RxbBh68YhN5MPc8ZrU7Dg0XsexNpvVI7tXFNAU6dCqZg1-dwLCvtcq3y71_17vOdr6-P9FeLxMOG_ixIuZ9A2gRBvbT1j00NR8rh_NK_9_WYeV3VLPK36KzMLI5ko4sN9Xty9NRbmxtlss9OEgJjaNQSyArmfQ-44NgUZ4kv4aWLM8jP-eQ0E/w1200-h630-p-k-no-nu/terrace-farming-kerala-home-garden.jpg') center/cover no-repeat;
+        background-color: #c8e6c9;
+    }
+
+    .hero-panel {
+        flex: 1 1 50%;
+        background-color: var(--forest-green);
+        color: var(--white);
+        padding: 60px 48px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .hero-panel h1 {
+        font-size: 2.75rem;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        color: var(--white) !important;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+    }
+
+    .hero-panel .hero-subtitle {
+        font-size: 1.25rem;
+        color: var(--lime-green-bright);
+        margin-bottom: 20px;
+        font-weight: 500;
+    }
+
+    .hero-panel .hero-desc {
+        font-size: 1rem;
+        color: rgba(255,255,255,0.9);
+        line-height: 1.6;
+        margin-bottom: 28px;
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+
+    .btn-hero-outline {
+        background: var(--white);
+        color: var(--forest-green);
+        border: 2px solid var(--forest-green);
+        padding: 12px 28px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-hero-outline:hover {
+        background: var(--pale-green);
+        color: var(--forest-green);
+        border-color: var(--forest-green);
+    }
+
+    .btn-hero-primary {
+        background: var(--lime-green);
+        color: var(--white);
+        border: none;
+        padding: 12px 28px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-hero-primary:hover {
+        background: var(--lime-green-bright);
+        color: var(--white);
+        transform: translateY(-2px);
+    }
+
+    /* Agricultural icons grid (reference design) – full width */
+    .ag-icons-wrapper {
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-bottom: 0;
+    }
+
+    .ag-icons-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 0;
+        max-width: 100%;
+        margin: 0;
+    }
+
+    .ag-icon-block {
+        aspect-ratio: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--white);
+        font-size: 2.5rem;
+        transition: opacity 0.2s ease;
+    }
+
+    .ag-icon-block:nth-child(odd) {
+        background-color: var(--forest-green);
+    }
+
+    .ag-icon-block:nth-child(even) {
+        background-color: var(--lime-green);
+    }
+
+    .ag-icon-block:hover {
+        opacity: 0.9;
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Feature Cards */
+    .features-section {
+        margin: 60px 0 80px;
+        padding-top: 20px;
+        animation: fadeInUp 1s ease 0.2s both;
+    }
+
+    .features-title {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+
+    .features-title h2 {
+        font-size: 2.8rem;
+        font-weight: 800;
+        color: var(--forest-green);
+        margin-bottom: 15px;
+    }
+
+    .features-title p {
+        font-size: 1.2rem;
+        color: #666;
+        font-weight: 500;
+    }
+
+    .feature-card {
+        background: var(--white);
+        border-radius: 20px;
+        padding: 40px 30px;
+        height: 100%;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        border-top: 5px solid var(--lime-green);
+        transition: all 0.35s ease;
+        position: relative;
+        overflow: hidden;
+        animation: fadeInUp 0.8s ease both;
+    }
+
+    .feature-card:nth-child(1) {
+        animation-delay: 0.3s;
+    }
+
+    .feature-card:nth-child(2) {
+        animation-delay: 0.4s;
+    }
+
+    .feature-card:nth-child(3) {
+        animation-delay: 0.5s;
+    }
+
+    .feature-card::before {
+        content: none;
+    }
+
+    .feature-card:hover::before {
+        left: 100%;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-12px);
+        box-shadow: 0 24px 48px rgba(27, 94, 32, 0.12);
+        border-top-color: var(--forest-green);
+    }
+
+    .feature-icon {
+        font-size: 2.5rem;
+        color: var(--forest-green);
+        margin-bottom: 20px;
+        background-color: var(--pale-green);
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: bounce 2s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    .feature-card:nth-child(1) .feature-icon {
+        animation-delay: 0s;
+    }
+
+    .feature-card:nth-child(2) .feature-icon {
+        animation-delay: 0.2s;
+    }
+
+    .feature-card:nth-child(3) .feature-icon {
+        animation-delay: 0.4s;
+    }
+
+    .feature-card h3 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--forest-green);
+        margin-bottom: 15px;
+        transition: color 0.3s ease;
+    }
+
+    .feature-card:hover h3 {
+        color: var(--text-dark);
+    }
+
+    .feature-card p {
+        color: #666;
+        font-size: 1rem;
+        line-height: 1.7;
+        margin-bottom: 25px;
+    }
+
+    .feature-list {
+        list-style: none;
+        margin-bottom: 25px;
+    }
+
+    .feature-list li {
+        color: #666;
+        padding: 8px 0;
+        font-size: 0.95rem;
+    }
+
+    .feature-list li::before {
+        content: '✓';
+        color: var(--lime-green);
+        font-weight: bold;
+        margin-right: 10px;
+        font-size: 1.2rem;
+    }
+
+    .feature-card .btn {
+        width: 100%;
+        font-weight: 700;
+        padding: 12px;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+    }
+
+    /* Stats Section */
+    .stats-section {
+        margin: 80px 0;
+        padding: 60px 40px;
+        background: var(--forest-green);
+        border-radius: 20px;
+        color: var(--white);
+        animation: fadeInUp 1s ease 0.6s both;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 30px;
+    }
+
+    .stat-number {
+        font-size: 2.8rem;
+        font-weight: 900;
+        margin-bottom: 10px;
+        color: var(--lime-green-bright);
+    }
+
+    .stat-label {
+        font-size: 1rem;
+        color: rgba(255,255,255,0.9);
+        font-weight: 500;
+    }
+
+    /* Testimonial Section */
+    .testimonial-section {
+        margin: 80px 0;
+        text-align: center;
+        animation: fadeInUp 1s ease 0.7s both;
+    }
+
+    .testimonial-section h2 {
+        font-size: 2.8rem;
+        font-weight: 800;
+        color: var(--forest-green);
+        margin-bottom: 50px;
+    }
+
+    .testimonial-card {
+        background: var(--white);
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        border-left: 5px solid var(--lime-green);
+        transition: all 0.3s ease;
+    }
+
+    .testimonial-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 50px rgba(27, 94, 32, 0.12);
+    }
+
+    .testimonial-text {
+        font-size: 1.1rem;
+        color: #666;
+        font-weight: 500;
+        margin-bottom: 20px;
+        font-style: italic;
+    }
+
+    .testimonial-author {
+        color: var(--forest-green);
+        font-weight: 700;
+    }
+
+    /* About Project Section */
+    .about-section {
+        margin: 80px 0;
+        padding: 50px 40px;
+        border-radius: 20px;
+        background-color: var(--white);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+        border: 1px solid rgba(27, 94, 32, 0.1);
+    }
+
+    .about-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 30px;
+        align-items: flex-start;
+    }
+
+    .about-grid>div {
+        flex: 1 1 280px;
+    }
+
+    .about-section h2 {
+        font-size: 2.4rem;
+        font-weight: 800;
+        color: var(--forest-green);
+        margin-bottom: 16px;
+    }
+
+    .about-section p {
+        color: #555;
+        line-height: 1.7;
+        font-size: 1rem;
+        margin-bottom: 14px;
+    }
+
+    .about-highlight {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--forest-green);
+        margin-bottom: 10px;
+    }
+
+    .about-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .about-badge {
+        background-color: var(--pale-green);
+        color: var(--forest-green);
+        border-radius: 999px;
+        padding: 6px 14px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .about-badge i {
+        color: var(--lime-green);
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .hero-image-col, .hero-panel {
+            flex: 1 1 100%;
+        }
+        .hero-image-col {
+            min-height: 280px;
+        }
+        .hero-panel {
+            padding: 40px 24px;
+        }
+        .hero-panel h1 {
+            font-size: 2rem;
+        }
+        .ag-icons-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .hero-panel h1 {
+            font-size: 1.75rem;
+        }
+        .hero-panel .hero-subtitle {
+            font-size: 1.1rem;
+        }
+        .hero-buttons {
+            flex-direction: column;
+        }
+        .btn-hero-outline, .btn-hero-primary {
+            width: 100%;
+            justify-content: center;
+        }
+        .features-title h2 {
+            font-size: 2rem;
+        }
+        .feature-card {
+            margin-bottom: 30px;
+        }
+        .ag-icons-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        .ag-icon-block {
+            font-size: 2rem;
+        }
+        .about-section {
+            padding: 30px 20px;
+        }
+    }
+</style>
+
+{% get_current_language as LANGUAGE_CODE %}
+
+<!-- Hero Banner (reference design: image left, green panel right) -->
+<div class="hero-banner-wrapper">
+    <div class="hero-banner">
+        <div class="hero-image-col" aria-hidden="true"></div>
+        <div class="hero-panel">
+            {% if LANGUAGE_CODE == 'hi' %}
+            <h1>फसल Sathi</h1>
+            <p class="hero-subtitle">प्राकृतिक और ताज़ा</p>
+            <p class="hero-desc">मशीन लर्निंग की मदद से सही फसल चुनें, बीमारियाँ जल्दी पहचानें और बाज़ार के लिए बेहतर निर्णय लें। अपनी खेती को डेटा और AI के साथ आगे बढ़ाएं।</p>
+            <div class="hero-buttons">
+                <a href="{% url 'index' %}#features" class="btn-hero-outline"><i class="fas fa-circle-info"></i> और जानें</a>
+                <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'login' %}{% endif %}" class="btn-hero-primary"><i class="fas fa-right-to-bracket"></i> लॉग इन</a>
+            </div>
+            {% else %}
+            <h1>फसल Sathi</h1>
+            <p class="hero-subtitle">Natural & Fresh</p>
+            <p class="hero-desc">Harness the power of machine learning to optimize crop selection, detect diseases early, and make informed market decisions. Grow smarter with data-driven agriculture.</p>
+            <div class="hero-buttons">
+                <a href="{% url 'index' %}#features" class="btn-hero-outline"><i class="fas fa-circle-info"></i> Learn More</a>
+                <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'login' %}{% endif %}" class="btn-hero-primary"><i class="fas fa-right-to-bracket"></i> Log In</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Agricultural Icons Grid (reference design) -->
+<div class="ag-icons-wrapper">
+<div class="ag-icons-grid">
+    <div class="ag-icon-block" title="Wheelbarrow"><i class="fas fa-dolly"></i></div>
+    <div class="ag-icon-block" title="Shovel"><i class="fas fa-trowel"></i></div>
+    <div class="ag-icon-block" title="Pitchfork"><i class="fas fa-wheat-awn"></i></div>
+    <div class="ag-icon-block" title="Watering"><i class="fas fa-fill-drip"></i></div>
+    <div class="ag-icon-block" title="Seedling"><i class="fas fa-seedling"></i></div>
+    <div class="ag-icon-block" title="Spray"><i class="fas fa-spray-can"></i></div>
+</div>
+</div>
+
+<!-- Features Section -->
+<div class="features-section" id="features">
+    <div class="features-title">
+        {% if LANGUAGE_CODE == 'hi' %}
+        <h2>हमारी स्मार्ट सुविधाएँ</h2>
+        <p>आधुनिक किसानों के लिए बुद्धिमान औज़ार</p>
+        {% else %}
+        <h2>Our Smart Features</h2>
+        <p>Intelligent tools designed for modern farmers</p>
+        {% endif %}
+    </div>
+
+    <div class="row g-4">
+        <!-- Crop Recommendation Card -->
+        <div class="col-md-6 col-lg-4">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-leaf"></i>
+                </div>
+                <h3>🌱 Crop Recommendation</h3>
+                <p>Get AI-powered crop recommendations based on your specific soil conditions and weather patterns.</p>
+                <ul class="feature-list">
+                    <li>Analyze soil properties</li>
+                    <li>Weather integration</li>
+                    <li>Optimal yield prediction</li>
+                    <li>Seasonal analysis</li>
+                </ul>
+                <a href="{% if user.is_authenticated %}{% url 'crop' %}{% else %}{% url 'login' %}{% endif %}"
+                    class="btn btn-success">
+                    <i class="fas fa-arrow-right"></i> Explore Now
+                </a>
+            </div>
+        </div>
+
+        <!-- Disease Detection Card -->
+        <div class="col-md-6 col-lg-4">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-microscope"></i>
+                </div>
+                <h3>🔍 Disease Detection</h3>
+                <p>Identify plant diseases early using advanced image analysis technology for quick intervention.</p>
+                <ul class="feature-list">
+                    <li>Image-based detection</li>
+                    <li>Multiple crop support</li>
+                    <li>Real-time analysis</li>
+                    <li>Disease classification</li>
+                </ul>
+                <a href="{% if user.is_authenticated %}{% url 'disease' %}{% else %}{% url 'login' %}{% endif %}"
+                    class="btn btn-success">
+                    <i class="fas fa-arrow-right"></i> Scan Now
+                </a>
+            </div>
+        </div>
+
+        <!-- Market Prediction Card -->
+        <div class="col-md-6 col-lg-4">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>📊 Market Prediction</h3>
+                <p>Forecast market prices and demand trends to maximize your profit and plan ahead strategically.</p>
+                <ul class="feature-list">
+                    <li>Price forecasting</li>
+                    <li>Demand analysis</li>
+                    <li>Trend prediction</li>
+                    <li>Crop comparison</li>
+                </ul>
+                <a href="{% if user.is_authenticated %}{% url 'market' %}{% else %}{% url 'login' %}{% endif %}"
+                    class="btn btn-success">
+                    <i class="fas fa-arrow-right"></i> View Trends
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- About Smart Farm AI -->
+<div class="about-section">
+    <div class="about-grid">
+        <div>
+            {% if LANGUAGE_CODE == 'hi' %}
+            <h2>फसल Sathi के बारे में</h2>
+            <p>
+                फसल Sathi किसानों, कृषि विशेषज्ञों और एग्री-बिज़नेस के लिए बनाया गया एक स्मार्ट निर्णय
+                सहायक प्लेटफ़ॉर्म है। यह फसल विज्ञान और मशीन लर्निंग को जोड़कर आपको ज़मीन पर उपयोगी सलाह देता है।
+            </p>
+            <p>
+                कौन सी फसल बोनी है, पत्तों पर दिखने वाली बीमारी को जल्दी पहचानना, और कब-क्या बेचना है – इन सब में
+                यह प्लेटफ़ॉर्म आपको डेटा आधारित निर्णय लेने में मदद करता है।
+            </p>
+            <p>
+                यह इतना सरल है कि नए किसान भी इसे आसानी से चला सकें, और इतना शक्तिशाली कि अनुभवी किसान भी अपनी
+                रोज़मर्रा की योजना में एआई का उपयोग कर सकें।
+            </p>
+            {% else %}
+            <h2>About फसल Sathi</h2>
+            <p>
+                फसल Sathi is an intelligent decision-support platform designed for farmers, agronomists, and
+                agri-businesses. It combines crop science with machine learning models to provide
+                practical, field-ready insights instead of generic suggestions.
+            </p>
+            <p>
+                From choosing the right crop for your land to catching diseases early and planning when to sell, फसल Sathi helps you make confident, data-driven decisions while respecting your local growing conditions.
+            </p>
+            <p>
+                The platform is built to be simple enough for first-time users and powerful enough for experienced
+                growers who want to bring AI into their everyday farm planning.
+            </p>
+            {% endif %}
+        </div>
+        <div>
+            <h3 class="about-highlight">What you can do with फसल Sathi</h3>
+            <ul class="feature-list">
+                <li>Compare which crops are best suited for your soil and climate.</li>
+                <li>Upload leaf images to detect common plant diseases early.</li>
+                <li>Track market trends so you know when and what to sell.</li>
+                <li>Experiment safely with “what-if” scenarios before planting.</li>
+            </ul>
+            <div class="about-badges">
+                <span class="about-badge">
+                    <i class="fas fa-brain"></i> AI-driven insights
+                </span>
+                <span class="about-badge">
+                    <i class="fas fa-tractor"></i> Built for real/small scale farms
+                </span>
+                <span class="about-badge">
+                    <i class="fas fa-globe-asia"></i> Climate-aware decisions
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Section -->
+<div class="stats-section">
+    <div class="row">
+        <div class="col-md-3 col-6 stat-item">
+            <div class="stat-number">21+</div>
+            <div class="stat-label">Plant Diseases Detected</div>
+        </div>
+        <div class="col-md-3 col-6 stat-item">
+            <div class="stat-number">10+</div>
+            <div class="stat-label">Crops Supported</div>
+        </div>
+        <div class="col-md-3 col-6 stat-item">
+            <div class="stat-number">30</div>
+            <div class="stat-label">Days of Forecasting</div>
+        </div>
+        <div class="col-md-3 col-6 stat-item">
+            <div class="stat-number">AI</div>
+            <div class="stat-label">Powered Accuracy</div>
+        </div>
+    </div>
+</div>
+
+<!-- Testimonial Section -->
+<div class="testimonial-section">
+    <h2>Why Choose फसल Sathi?</h2>
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="testimonial-card">
+                <div class="testimonial-text">
+                    "This platform has revolutionized how I manage my crops. The disease detection feature saved my
+                    harvest!"
+                </div>
+                <div class="testimonial-author">
+                    <i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="fas fa-star"></i> <i
+                        class="fas fa-star"></i> <i class="fas fa-star"></i> Farmer Raj
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="testimonial-card">
+                <div class="testimonial-text">
+                    "The market prediction helps me understand when to sell and what to grow. Highly recommended!"
+                </div>
+                <div class="testimonial-author">
+                    <i class="fas fa-star"></i> <i class="fas fa-star"></i> <i class="fas fa-star"></i> <i
+                        class="fas fa-star"></i> <i class="fas fa-star"></i> Farmer Priya
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CTA Section -->
+<div style="text-align: center; padding: 60px 20px; margin: 80px 0;">
+    <h2 style="font-size: 2.5rem; font-weight: 800; color: var(--forest-green); margin-bottom: 20px;">Ready to Transform Your Farm?</h2>
+    <p style="font-size: 1.2rem; color: #555; margin-bottom: 30px;">Start using फसल Sathi today and make data-driven farming decisions.</p>
+    <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+        <a href="{% if user.is_authenticated %}{% url 'crop' %}{% else %}{% url 'login' %}{% endif %}" class="btn btn-success btn-lg" style="padding: 15px 45px; font-weight: 700;">
+            <i class="fas fa-play-circle"></i> Get Started
+        </a>
+        <a href="{% url 'index' %}#features" class="btn-hero-outline btn-lg" style="padding: 15px 45px; font-weight: 700;">
+            <i class="fas fa-question-circle"></i> Learn More
+        </a>
+    </div>
+</div>
+
+{% endblock %}

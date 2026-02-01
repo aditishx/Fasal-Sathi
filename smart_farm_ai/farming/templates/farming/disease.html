@@ -1,0 +1,436 @@
+{% extends 'farming/base.html' %}
+{% block content %}
+
+<style>
+    .disease-container {
+        max-width: 900px;
+        margin: 60px auto;
+        animation: slideInUp 0.6s ease;
+    }
+
+    .disease-card {
+        background: white;
+        border-radius: 25px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06);
+        padding: 50px 40px;
+        border-top: 6px solid var(--muted-olive);
+    }
+
+    .disease-card h2 {
+        color: #1b5e20;
+        font-size: 2.2rem;
+        font-weight: 800;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    .disease-card .subtitle {
+        text-align: center;
+        color: #666;
+        font-size: 1.1rem;
+        margin-bottom: 40px;
+        font-weight: 500;
+    }
+
+    .upload-section {
+        background-color: var(--vanilla-cream);
+        border: 3px dashed var(--muted-olive);
+        border-radius: 20px;
+        padding: 60px 40px;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        margin-bottom: 30px;
+    }
+
+    .upload-section:hover {
+        background-color: var(--cream);
+        border-color: var(--faded-copper);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    }
+
+    .upload-section input[type="file"] {
+        display: none;
+    }
+
+    .upload-icon {
+        font-size: 3.5rem;
+        color: var(--muted-olive);
+        margin-bottom: 15px;
+        animation: bounce 2s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-15px);
+        }
+    }
+
+    .upload-text {
+        color: #1b5e20;
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .upload-subtext {
+        color: #666;
+        font-size: 0.95rem;
+    }
+
+    .upload-section.has-file {
+        background-color: var(--cream);
+        border-color: var(--faded-copper);
+    }
+
+    .upload-section.has-file .upload-icon {
+        font-size: 4rem;
+        animation: none;
+    }
+
+    .preview-image {
+        max-width: 100%;
+        max-height: 300px;
+        border-radius: 15px;
+        margin: 20px 0;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .info-box {
+        background-color: var(--vanilla-cream);
+        border-left: 4px solid var(--faded-copper);
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .info-box i {
+        color: var(--faded-copper);
+        font-size: 1.5rem;
+    }
+
+    .info-box p {
+        color: var(--ash-brown);
+        margin: 0;
+        font-weight: 500;
+    }
+
+    .btn-submit {
+        width: 100%;
+        background-color: var(--faded-copper);
+        color: var(--vanilla-cream);
+        border: none;
+        border-radius: 50px;
+        padding: 16px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .btn-submit:hover:not(:disabled) {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+        background-color: var(--ash-brown);
+    }
+
+    .btn-submit:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .result-section {
+        margin-top: 40px;
+        padding-top: 30px;
+        border-top: 2px solid #e0e0e0;
+    }
+
+    .result-card {
+        background-color: var(--cream);
+        border: 2px solid var(--muted-olive);
+        border-radius: 20px;
+        padding: 40px;
+        text-align: center;
+        animation: slideInUp 0.5s ease;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    }
+
+    .result-label {
+        color: #155724;
+        font-size: 1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 15px;
+    }
+
+    .disease-name {
+        font-size: 2.5rem;
+        font-weight: 900;
+        color: var(--ash-brown);
+        margin: 20px 0;
+        text-transform: capitalize;
+    }
+
+    .confidence-bar {
+        background: white;
+        border-radius: 10px;
+        height: 30px;
+        margin: 20px 0;
+        overflow: hidden;
+        box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .confidence-fill {
+        height: 100%;
+        background-color: var(--muted-olive);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 0.9rem;
+        transition: width 0.5s ease;
+    }
+
+    .recommendation {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-top: 20px;
+        border-left: 4px solid var(--muted-olive);
+        text-align: left;
+    }
+
+    .recommendation h4 {
+        color: var(--ash-brown);
+        font-weight: 700;
+        margin-bottom: 12px;
+    }
+
+    .recommendation p {
+        color: #555;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 0;
+    }
+
+    .error-card {
+        background-color: #fdecea;
+        border: 2px solid #dc3545;
+        border-radius: 20px;
+        padding: 40px;
+        text-align: center;
+        animation: slideInUp 0.5s ease;
+    }
+
+    .error-icon {
+        font-size: 3rem;
+        color: #dc3545;
+        margin-bottom: 15px;
+    }
+
+    .error-message {
+        color: #721c24;
+        font-weight: 600;
+    }
+
+    .file-name {
+        color: #1b5e20;
+        font-weight: 600;
+        margin-top: 10px;
+    }
+
+    @media (max-width: 768px) {
+        .disease-card {
+            padding: 30px 20px;
+        }
+
+        .disease-card h2 {
+            font-size: 1.8rem;
+        }
+
+        .upload-section {
+            padding: 40px 20px;
+        }
+
+        .disease-name {
+            font-size: 1.8rem;
+        }
+
+        .result-card {
+            padding: 30px 20px;
+        }
+    }
+
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<div class="disease-container">
+    <div class="disease-card">
+        <h2><i class="fas fa-microscope"></i> Plant Disease Detection</h2>
+        <p class="subtitle">Upload a leaf image and our AI will identify any diseases</p>
+
+        <div class="info-box">
+            <i class="fas fa-info-circle"></i>
+            <p>Upload a clear image of the affected leaf for accurate disease detection. Supported formats: JPG, PNG,
+                GIF</p>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data" id="diseaseForm">
+            {% csrf_token %}
+
+            <div class="upload-section" id="uploadSection" onclick="document.getElementById('leafInput').click()">
+                <div class="upload-icon" id="uploadIcon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <div class="upload-text">Click to Upload Image</div>
+                <div class="upload-subtext">or drag and drop</div>
+                <div class="file-name" id="fileName"></div>
+                <input type="file" id="leafInput" name="image" accept="image/*" required>
+            </div>
+
+            <div id="previewContainer"></div>
+
+            <button type="submit" class="btn-submit" id="submitBtn">
+                <i class="fas fa-search"></i> Analyze Leaf
+            </button>
+        </form>
+
+        <!-- Result Section -->
+        {% if result %}
+        <div class="result-section">
+            {% if result.disease == "Healthy" %}
+            <div class="result-card">
+                <div class="result-label">✅ Analysis Result</div>
+                <div class="disease-name" style="color: #28a745;">{{ result.disease }}</div>
+                <div style="color: #155724; font-size: 1.1rem; font-weight: 500;">
+                    Your plant appears to be healthy!
+                </div>
+                <div style="color: #155724; font-size: 0.95rem; margin-top: 15px;">
+                    Keep monitoring your plants regularly for early disease detection.
+                </div>
+            </div>
+            {% else %}
+            <div class="result-card">
+                <div class="result-label">🔍 Disease Detected</div>
+                <div class="disease-name">{{ result.disease }}</div>
+
+                <div style="background: white; border-radius: 10px; padding: 15px;">
+                    <div style="color: #666; font-size: 1rem; margin-bottom: 10px;">
+                        <strong>Confidence Score</strong>
+                    </div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill"
+                            data-width="{{ result.confidence|default_if_none:0|floatformat:2 }}">
+                            {{ result.confidence|default_if_none:0|floatformat:2 }}%
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recommendation">
+                    <h4><i class="fas fa-prescription-bottle"></i> Recommended Actions</h4>
+                    <p>
+                        <strong>1. Isolation:</strong> Isolate affected plants to prevent disease spread.<br><br>
+                        <strong>2. Treatment:</strong> Use appropriate fungicides or pesticides based on disease type.
+                        Consult local agriculture experts for specific recommendations.<br><br>
+                        <strong>3. Monitoring:</strong> Monitor other plants closely for early symptoms.<br><br>
+                        <strong>4. Prevention:</strong> Implement proper crop rotation and maintain good farming
+                        practices.
+                    </p>
+                </div>
+
+                <div
+                    style="background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 10px; padding: 15px; margin-top: 20px; text-align: left;">
+                    <p style="color: #856404; margin: 0; font-size: 0.9rem;">
+                        <strong>⚠️ Disclaimer:</strong> This detection is based on image analysis and should not be
+                        considered as professional agricultural advice.
+                        Always consult with local agricultural experts for confirmation and detailed treatment plans.
+                    </p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Error Section -->
+        {% if error %}
+        <div class="error-card">
+            <div class="error-icon">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <div class="error-message">{{ error }}</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    const uploadSection = document.getElementById('uploadSection');
+    const leafInput = document.getElementById('leafInput');
+    const fileName = document.getElementById('fileName');
+    const previewContainer = document.getElementById('previewContainer');
+    const uploadIcon = document.getElementById('uploadIcon');
+
+    // Drag and drop functionality
+    uploadSection.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadSection.style.background = 'linear-gradient(135deg, #a5d6a7 0%, #81c784 100%)';
+    });
+
+    uploadSection.addEventListener('dragleave', () => {
+        uploadSection.style.background = 'linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%)';
+    });
+
+    uploadSection.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadSection.style.background = 'linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%)';
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            leafInput.files = files;
+            showPreview(files[0]);
+        }
+    });
+
+    // File input change event
+    leafInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            showPreview(e.target.files[0]);
+        }
+    });
+
+    function showPreview(file) {
+        fileName.textContent = '✓ ' + file.name;
+        uploadSection.classList.add('has-file');
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            previewContainer.innerHTML = `<img src="${e.target.result}" class="preview-image" alt="Preview">`;
+        };
+        reader.readAsDataURL(file);
+    }
+</script>
+
+{% endblock %}
