@@ -21,10 +21,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-(%v&cg-t+d5du)h9xl3%3hgc$8+8)@7@a6l7zuboc)th7!=8c4'
+# SECRET_KEY = 'django-insecure-(%v&cg-t+d5du)h9xl3%3hgc$8+8)@7@a6l7zuboc)th7!=8c4'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+# # SECURITY WARNING: don't run with debug turned on in production!
+# DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 
@@ -131,3 +131,4 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = os.environ.get("DEBUG") == "True"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"

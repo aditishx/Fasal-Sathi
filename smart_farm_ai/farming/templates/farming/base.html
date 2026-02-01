@@ -15,6 +15,10 @@
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <meta name="theme-color" content="#2e7d32">
+
+
     <style>
         * {
             margin: 0;
@@ -669,6 +673,17 @@
             });
         })();
     </script>
+
+    <script>
+        if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+            navigator.serviceWorker.register("/static/service-worker.js")
+            .then(reg => console.log("Service Worker registered", reg))
+            .catch(err => console.log("Service Worker failed", err));
+        });
+        }
+    </script>
+    
 
 </body>
 
