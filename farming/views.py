@@ -65,6 +65,7 @@ def crop_recommend(request):
 
 
 @login_required(login_url='login')
+
 def disease_detection(request):
     from farming.disease.predictor import predict_disease
     result = None
@@ -78,29 +79,39 @@ def disease_detection(request):
 
         # Save image temporarily
         fs = FileSystemStorage()
-        disease_images = fs.save(image.name, image)
-        image_path = fs.path(disease_images)
+        saved_image_name = fs.save(image.name, image)
+        image_path = fs.path(saved_image_name)
 
-        # ML Prediction
-        disease, confidence = predict_disease(image_path)
+        try:
+            # Predict disease using rule-based method
+            disease, confidence = predict_disease(image_path)
 
-        disease = disease.replace("___", " - ")
-        confidence = round(confidence, 2)
+            disease = disease.replace("___", " - ")
+            confidence = round(confidence, 2)
 
-        # Save to database
-        DiseaseDetection.objects.create(
-            user=request.user,
-            image=image,
-            disease_name=disease,
-            confidence=confidence
-        )
+            # Save to database
+            DiseaseDetection.objects.create(
+                user=request.user,
+                image=image,
+                disease_name=disease,
+                confidence=confidence
+            )
 
-        result = {
-            "disease": disease,
-            "confidence": confidence
-        }
+            result = {
+                "disease": disease,
+                "confidence": confidence
+            }
+
+        except Exception as e:
+            messages.error(request, f"Error processing image: {str(e)}")
+            fs.delete(saved_image_name)
+            return redirect("disease")
+
+        # Optionally delete temp image to save storage
+        fs.delete(saved_image_name)
 
     return render(request, "farming/disease.html", {"result": result})
+
 
 def market_prediction(request):
     from farming.ml.market_predict import predict_prices, get_market_insights, get_all_crops, compare_crops
