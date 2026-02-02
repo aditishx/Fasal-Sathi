@@ -3,12 +3,16 @@ from PIL import Image
 import os
 from .labels import CLASS_NAMES
 import tensorflow as tf
-from tensorflow.keras.models import load_model
 
 
-MODEL_PATH = "farming/disease/model.h5"
+MODEL_PATH = os.path.join(
+    settings.BASE_DIR,
+    "farming",
+    "disease",
+    "plant_disease_model.h5"
+)
 
-model = tf.keras.models.load_model(MODEL_PATH)
+model = load_model(MODEL_PATH)
 
 
 def analyze_image_features(image_path):

@@ -131,6 +131,9 @@ STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 
-SECRET_KEY = os.environ.get("SECRET_KEY")
-DEBUG = os.environ.get("DEBUG") == "True"
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY",
+    "django-insecure-dev-only-change-this"
+)
+# DEBUG = os.environ.get("DEBUG") == "True"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
