@@ -32,6 +32,33 @@
         animation: fadeIn 0.8s ease 0.2s both;
     }
 
+    .dashboard-card {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    margin: 40px 0;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    }
+
+    .user-info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+    }
+
+    .info-item .label {
+        font-size: 0.9rem;
+        color: #666;
+        font-weight: 600;
+    }
+
+    .info-item .value {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #1b5e20;
+    }
+
+
     .feature-box {
         background: white;
         border-radius: 20px;
@@ -275,7 +302,7 @@
 </div>
 
 <!-- Quick Stats -->
-<div class="quick-stats">
+<!-- <div class="quick-stats">
     <div class="stat-card">
         <div class="stat-number">21+</div>
         <div class="stat-label">Diseases Detectable</div>
@@ -291,6 +318,43 @@
     <div class="stat-card">
         <div class="stat-number">AI</div>
         <div class="stat-label">Powered Analysis</div>
+    </div>
+</div> -->
+
+<div class="dashboard-card user-card">
+    <h3 class="card-title">User Profile</h3>
+
+    <div class="user-info-grid">
+        <div class="info-item">
+            <span class="label">Username</span>
+            <span class="value">{{ request.user.username }}</span>
+        </div>
+
+        <div class="info-item">
+            <span class="label">Full Name</span>
+            <span class="value">
+                {{ request.user.first_name }} {{ request.user.last_name }}
+            </span>
+        </div>
+
+        <div class="info-item">
+            <span class="label">Email</span>
+            <span class="value">{{ request.user.email }}</span>
+        </div>
+
+        <div class="info-item">
+            <span class="label">Joined On</span>
+            <span class="value">
+                {{ request.user.date_joined|date:"d M Y" }}
+            </span>
+        </div>
+
+        <div class="info-item">
+            <span class="label">Last Login</span>
+            <span class="value">
+                {{ request.user.last_login|date:"d M Y, H:i" }}
+            </span>
+        </div>
     </div>
 </div>
 

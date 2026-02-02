@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
-
+# from django.http import HttpResponse
 # from django.contrib.auth.models import UserProfile
 from django.core.files.storage import FileSystemStorage
 from django.contrib.auth import authenticate, login, logout
@@ -27,6 +26,7 @@ def crop_recommend(request):
     from farming.models import CropRecommendation
 
     result = None
+    error = None
 
     if request.method == "POST":
         fertility = request.POST['fertility']
@@ -42,29 +42,31 @@ def crop_recommend(request):
         data = [N, P, K, temperature, humidity, ph, rainfall_mm]
 
         # 🔥 Predict multiple crops
-        results = predict_crops(data, top_k=3)
+        try:
+            results = predict_crops(data, top_k=3)
+        except FileNotFoundError as exc:
+            error = str(exc)
+            results = None
 
         # 🔥 Save each crop
-        for r in results:
-            CropRecommendation.objects.create(
-                user=request.user,
-                recommended_crop=r["crop"],
-                fertility=fertility,
-                soil_type=soil_type,
-                climate=climate,
-                rainfall_level=rainfall,   # "medium"
-                rainfall=rainfall_mm,      # 120
-                temperature=temperature,
-                humidity=humidity,
-                ph=ph,
-            )
+        if results:
+            for r in results:
+                CropRecommendation.objects.create(
+                    user=request.user,
+                    recommended_crop=r["crop"],
+                    fertility=fertility,
+                    soil_type=soil_type,
+                    climate=climate,
+                    rainfall_level=rainfall,   # "medium"
+                    rainfall=rainfall_mm,      # 120
+                    temperature=temperature,
+                    humidity=humidity,
+                    ph=ph,
+                )
 
         result = results
 
-    return render(request, 'farming/crop.html', {'result': result})
-
-
-@login_required(login_url='login')
+    return render(request, 'farming/crop.html', {'result': result, 'error': error})
 
 def disease_detection(request):
     from farming.disease.predictor import predict_disease
@@ -133,18 +135,19 @@ def market_prediction(request):
         elif action == 'compare':
             selected_crops = request.POST.getlist('compare_crops')
             comparison = compare_crops(selected_crops)
-    
+            
+        MarketPrice.objects.create(
+            user=request.user,
+            crop_name=crop,
+            estimated_price=result
+        )
     return render(request, 'farming/market.html', {
         'result': result,
         'crops': crops,
         'comparison': comparison
     })
 
-    MarketPrice.objects.create(
-        user=request.user,
-        crop_name=crop,
-        estimated_price=result
-    )
+    
 
 @login_required
 
