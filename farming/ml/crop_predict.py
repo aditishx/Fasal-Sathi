@@ -1,11 +1,3 @@
-# import pickle
-
-
-# model = pickle.load(open("farming/ml/crop_model.pkl", "rb"))
-
-# def predict_crop(data):
-#     prediction = model.predict([data])
-#     return prediction[0]
 
 import pickle
 import os
